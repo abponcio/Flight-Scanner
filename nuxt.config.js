@@ -27,10 +27,22 @@ export default {
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
-    // https://go.nuxtjs.dev/eslint
-    '@nuxtjs/eslint-module',
-    // https://go.nuxtjs.dev/stylelint
-    '@nuxtjs/stylelint-module',
+    // Doc: https://github.com/nuxt-community/eslint-module
+    [
+      '@nuxtjs/eslint-module',
+      {
+        fix: true,
+      },
+    ],
+
+    // Doc: https://github.com/nuxt-community/stylelint-module
+    [
+      '@nuxtjs/stylelint-module',
+      {
+        fix: true,
+        files: ['assets/**/*.{s?(a|c)ss,less,stylus}'],
+      },
+    ],
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -42,7 +54,11 @@ export default {
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    // See https://github.com/nuxt-community/axios-module#options
+    baseURL: 'http://localhost:5001/api',
+    debug: true,
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
