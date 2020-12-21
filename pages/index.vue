@@ -153,6 +153,18 @@ export default {
 
   methods: {
     filterDepartureStations(val) {
+      // get all stations
+      const stations = JSON.parse(JSON.stringify(this.stations))
+
+      // we will not include the station from selected arrival station
+      stations.splice(
+        stations.findIndex(
+          (station) =>
+            station.PlaceName === this.search.arrivalStation.placeName
+        ),
+        1
+      )
+
       // check for value
       if (!val.length) {
         return this.stations
@@ -161,7 +173,7 @@ export default {
       // lowercase
       val = val.toLowerCase()
 
-      return this.stations.filter(
+      return stations.filter(
         (station) =>
           station.PlaceName.toLowerCase().includes(val) ||
           station.CountryName.toLowerCase().includes(val)
@@ -169,7 +181,7 @@ export default {
     },
 
     onDepartureStationSelected(station) {
-      this.search.departureStation.placeName = `${station.PlaceName}`
+      this.search.departureStation.placeName = station.PlaceName
       this.search.departureStation.countryName = station.CountryName
     },
 
@@ -194,7 +206,7 @@ export default {
       // lowercase
       val = val.toLowerCase()
 
-      return this.stations.filter(
+      return stations.filter(
         (station) =>
           station.PlaceName.toLowerCase().includes(val) ||
           station.CountryName.toLowerCase().includes(val)
@@ -202,7 +214,7 @@ export default {
     },
 
     onArrivalStationSelected(station) {
-      this.search.arrivalStation.placeName = `${station.PlaceName}`
+      this.search.arrivalStation.placeName = station.PlaceName
       this.search.arrivalStation.countryName = station.CountryName
     },
 
