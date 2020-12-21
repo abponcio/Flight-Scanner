@@ -1,50 +1,46 @@
 
 /* Index
 ------------------------------------------------------------------------------- */
+@import 'fonts';
 @import 'buttons';
 @import 'forms';
 
 body {
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.42857143;
-  color: #000;
-  background-color: #fff;
+  background-color: $primary-yellow;
+  color: $primary-black;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Roboto',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
 }
 
-.main-container {
-  max-width: 1400px;
-  padding: 0 20px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.section-main {
-  padding-top: 170px;
-  padding-bottom: 50px;
-  min-height: 90vh;
-}
-
+/* Date Picker
+------------------------------------------------------------------------------- */
 .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
 .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
 .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-  border: 1px solid #fff100 !important;
+  border: 1px solid $primary-yellow !important;
 }
 
 .vdp-datepicker__calendar .cell.selected {
-  background: #fff100 !important;
+  background: $primary-yellow !important;
 }
 
 .vdp-datepicker__calendar .cell.selected:hover {
-  background: #fff100 !important;
+  background: $primary-yellow !important;
 }
 
 .vdp-datepicker__calendar .cell.selected.highlighted {
-  background: #fff100 !important;
+  background: $primary-yellow !important;
 }
 
 .vdp-datepicker__calendar .cell.highlighted {
-  background: #fff100 !important;
+  background: $primary-yellow !important;
 }
 
 .vdp-datepicker__calendar .cell.highlighted.disabled {
@@ -53,4 +49,23 @@ body {
 
 .vdp-datepicker__calendar .cell.grey {
   color: #888;
+}
+
+.vdp-datepicker .form-control[readonly] {
+  background-color: $primary-white;
+}
+
+
+
+/* Box
+------------------------------------------------------------------------------- */
+.box-shadow {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.box-container {
+  background: $primary-white;
+  border-radius: 7px;
+  margin: 5px 0;
+  padding: 30px 60px;
 }

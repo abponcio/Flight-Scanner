@@ -278,17 +278,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.v-suggestions {
+  position: relative;
+}
 .dropdown__wrapper {
   padding: 30px;
-  background: #fff;
-  border: 1px solid #000;
+  background: $primary-white;
+  border: 1px solid $primary-black;
   border-radius: 5px;
-  box-shadow: 3px 3px 0 1px #000;
+  box-shadow: 3px 3px 0 1px $primary-black;
   position: absolute;
   z-index: 99;
   padding: 20px 10px;
   text-align: left;
-  width: 200%;
+  width: 100%;
 
   &.arrow-up {
     top: calc(100% + 10px);
@@ -304,7 +307,7 @@ export default {
       margin-left: -5px;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
-      border-bottom: 9px solid #fff;
+      border-bottom: 9px solid $primary-white;
     }
 
     &:after {
@@ -317,13 +320,13 @@ export default {
       margin-left: -5px;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 10px solid #000;
+      border-bottom: 10px solid $primary-black;
     }
   }
 }
 
 .country__wrap-outer {
-  max-height: 500px;
+  max-height: 250px;
   overflow-y: auto;
 }
 .country__wrap-inner {
@@ -342,12 +345,12 @@ export default {
     list-style: none;
 
     li {
-      border-bottom: 0.5px solid #ffe900;
+      border-bottom: 0.5px solid $primary-yellow;
 
       a {
         display: block;
         font-size: 0.875rem;
-        color: #000;
+        color: $primary-black;
         padding: 5px 10px;
         text-decoration: none;
       }
@@ -360,12 +363,12 @@ export default {
 
       &:hover {
         cursor: pointer;
-        background-color: #000;
-        color: #fff !important;
+        background-color: $primary-black;
+        color: $primary-white !important;
 
         a {
-          background-color: #000;
-          color: #fff !important;
+          background-color: $primary-black;
+          color: $primary-white !important;
         }
       }
     }

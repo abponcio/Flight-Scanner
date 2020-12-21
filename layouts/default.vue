@@ -1,11 +1,7 @@
 <template>
-  <main>
-    <section class="main-container">
-      <section class="section-main">
-        <!-- Content -->
-        <nuxt />
-      </section>
-    </section>
+  <main class="container">
+    <!-- Content -->
+    <nuxt />
   </main>
 </template>
 

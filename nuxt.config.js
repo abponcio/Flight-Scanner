@@ -28,6 +28,10 @@ export default {
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
 
+  styleResources: {
+    scss: ['./assets/scss/_variables.scss'],
+  },
+
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
@@ -46,6 +50,9 @@ export default {
         files: ['assets/**/*.{s?(a|c)ss,less,stylus}'],
       },
     ],
+
+    // https://github.com/nuxt-community/style-resources-module
+    '@nuxtjs/style-resources',
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
