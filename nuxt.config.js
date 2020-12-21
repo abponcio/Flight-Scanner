@@ -1,4 +1,8 @@
+import dotenv from 'dotenv'
+
 export default {
+  env: dotenv.config().parsed,
+
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
 
