@@ -1,0 +1,56 @@
+
+/* Index
+------------------------------------------------------------------------------- */
+@import 'buttons';
+@import 'forms';
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.42857143;
+  color: #000;
+  background-color: #fff;
+}
+
+.main-container {
+  max-width: 1400px;
+  padding: 0 20px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.section-main {
+  padding-top: 170px;
+  padding-bottom: 50px;
+  min-height: 90vh;
+}
+
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
+  border: 1px solid #fff100 !important;
+}
+
+.vdp-datepicker__calendar .cell.selected {
+  background: #fff100 !important;
+}
+
+.vdp-datepicker__calendar .cell.selected:hover {
+  background: #fff100 !important;
+}
+
+.vdp-datepicker__calendar .cell.selected.highlighted {
+  background: #fff100 !important;
+}
+
+.vdp-datepicker__calendar .cell.highlighted {
+  background: #fff100 !important;
+}
+
+.vdp-datepicker__calendar .cell.highlighted.disabled {
+  color: #a3a3a3;
+}
+
+.vdp-datepicker__calendar .cell.grey {
+  color: #888;
+}
