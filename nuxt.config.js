@@ -1,8 +1,4 @@
-import dotenv from 'dotenv'
-
 export default {
-  env: dotenv.config().parsed,
-
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
 
@@ -54,6 +50,9 @@ export default {
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
+    // https://www.npmjs.com/package/@nuxtjs/dotenv
+    '@nuxtjs/dotenv',
+
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
   ],
