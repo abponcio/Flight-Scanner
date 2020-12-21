@@ -50,9 +50,10 @@
             <label>Departure Date</label>
             <Datepicker
               v-model="search.departureDate"
+              placeholder="01 Jan 2020"
               format="dd MMM yyyy"
               :input-class="dateValidate"
-              placeholder="01 Jan 2020"
+              :disabled-dates="disablePastDates"
             ></Datepicker>
             <div
               v-if="$v.search.departureDate.$error"
@@ -70,6 +71,7 @@
               format="dd MMM yyyy"
               input-class="form-control"
               placeholder="01 Jan 2020"
+              :disabled-dates="disablePastDates"
             ></Datepicker>
           </div>
         </div>
@@ -138,6 +140,9 @@ export default {
       desc: false,
       flightNumber: null,
       sortby: null,
+    },
+    disablePastDates: {
+      to: new Date(Date.now() - 3600 * 1000 * 24),
     },
   }),
 
@@ -246,7 +251,12 @@ export default {
     font-size: clamp(25px, 8vw, 40px);
   }
 
+  label {
+    margin-bottom: 0;
+  }
+
   .btn-default {
+    font-size: 20px;
     margin-top: 15px;
     width: 100%;
   }
