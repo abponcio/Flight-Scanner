@@ -3,7 +3,11 @@
     <div class="flight-departure">
       <h2>Departure Flight</h2>
       <div class="routes-filter-sort">
-        <div class="routes">Cebu to Manila</div>
+        <div class="routes">
+          {{ departureFlights.Places[1].CityName }}
+          <img src="~/assets/images/plane.svg" alt="Plane" />
+          {{ departureFlights.Places[0].CityName }}
+        </div>
         <div class="sort">
           <div>Sort by:</div>
           <select class="custom-select">
@@ -22,28 +26,28 @@
           <div>Arrival</div>
           <div>Fare</div>
         </div>
-        <div class="flight-box">
-          <input type="radio" value="1" name="radio2" />
+        <div
+          v-for="(quote, quoteIndex) in departureFlights.Quotes"
+          :key="quoteIndex"
+          class="flight-box"
+        >
+          <input type="radio" :value="quoteIndex" name="deparureFlight" />
           <div class="flight-table">
-            <div class="airline">Airline</div>
-            <div class="departure">Departure</div>
+            <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
+            <div class="departure">
+              <div class="code">{{ departureFlights.Places[1].IataCode }}</div>
+              <div class="name">{{ departureFlights.Places[1].Name }}</div>
+            </div>
             <div class="image">
               <img src="~/assets/images/plane.svg" alt="Plane" />
             </div>
-            <div class="arrival">Arrival</div>
-            <div class="fare">Fare</div>
-          </div>
-        </div>
-        <div class="flight-box">
-          <input type="radio" value="2" name="radio2" />
-          <div class="flight-table">
-            <div class="airline">Airline</div>
-            <div class="departure">Departure</div>
-            <div class="image">
-              <img src="~/assets/images/plane.svg" alt="Plane" />
+            <div class="arrival">
+              <div class="code">{{ departureFlights.Places[0].IataCode }}</div>
+              <div class="name">{{ departureFlights.Places[0].Name }}</div>
             </div>
-            <div class="arrival">Arrival</div>
-            <div class="fare">Fare</div>
+            <div class="fare">
+              {{ departureFlights.Currencies[0].Symbol }}{{ quote.MinPrice }}
+            </div>
           </div>
         </div>
       </div>
@@ -106,10 +110,31 @@ export default {
   async asyncData({ $axios }) {
     const getFlights = await $axios.get(
       //   `/apiservices/browseroutes/v1.0/PH/USD/en-US/MNL-sky/JFK-sky/2020-12-25`
-      `/apiservices/browseroutes/v1.0/PH/USD/en-US/SFO-sky/ORD-sky/2020-12-28`
+      `/apiservices/browseroutes/v1.0/PH/USD/en-US/SFO-sky/ORD-sky/2020-12-25`
     )
 
-    return { departureFlights: getFlights.data }
+    const data = getFlights.data
+    const quotes = getFlights.data.Quotes
+
+    for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
+      const outBoundLeg = quotes[quoteIndex].OutboundLeg.CarrierIds
+      for (
+        let outBoundLegIndex = 0;
+        outBoundLegIndex < outBoundLeg.length;
+        outBoundLegIndex++
+      ) {
+        const carrierId = outBoundLeg[outBoundLegIndex]
+        quotes[quoteIndex].OutboundLeg.Carrier = getFlights.data.Carriers.find(
+          (carrier) => carrier.CarrierId === carrierId
+        )
+      }
+    }
+
+    data.Quotes = quotes
+
+    console.log(data)
+
+    return { departureFlights: data }
   },
 
   data: () => ({
@@ -136,6 +161,12 @@ export default {
     .routes {
       font-size: 20px;
       font-weight: 600;
+
+      img {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: 25px;
+      }
     }
 
     .sort {
@@ -176,9 +207,20 @@ export default {
 
       input:checked ~ .flight-table {
         border: 2px solid $primary-black;
+
+        &::before {
+          border: 2px solid $primary-black;
+          border-left-color: $primary-yellow;
+        }
+
+        &::after {
+          border: 2px solid $primary-black;
+          border-right-color: $primary-yellow;
+        }
       }
 
       .flight-table {
+        align-items: center;
         background: $primary-white;
         border-radius: 12px;
         color: $primary-black;
@@ -194,6 +236,7 @@ export default {
           background: $primary-yellow;
           content: '';
           height: 20px;
+
           position: absolute;
           width: 15px;
         }
@@ -250,6 +293,19 @@ export default {
           img {
             width: 30px;
             position: relative;
+          }
+        }
+
+        .departure,
+        .arrival {
+          .code {
+            font-size: 40px;
+            line-height: 35px;
+          }
+
+          .name {
+            font-weight: 500;
+            font-size: 12px;
           }
         }
       }
