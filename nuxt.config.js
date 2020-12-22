@@ -53,6 +53,9 @@ export default {
 
     // https://github.com/nuxt-community/style-resources-module
     '@nuxtjs/style-resources',
+
+    // https://github.com/nuxt-community/date-fns-module
+    '@nuxtjs/date-fns',
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)

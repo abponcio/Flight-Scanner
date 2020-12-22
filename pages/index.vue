@@ -50,10 +50,10 @@
             <label>Departure Date</label>
             <Datepicker
               v-model="search.departureDate"
-              placeholder="01 Jan 2020"
-              format="dd MMM yyyy"
-              :input-class="dateValidate"
               :disabled-dates="disablePastDates"
+              :input-class="dateValidate"
+              format="dd MMM yyyy"
+              :placeholder="$dateFns.format(new Date(), 'dd MMM yyyy')"
             ></Datepicker>
             <div
               v-if="$v.search.departureDate.$error"
@@ -68,10 +68,10 @@
             <label>Return Date</label>
             <Datepicker
               v-model="search.returnDate"
+              :disabled-dates="disablePastDates"
               format="dd MMM yyyy"
               input-class="form-control"
-              placeholder="01 Jan 2020"
-              :disabled-dates="disablePastDates"
+              :placeholder="$dateFns.format(new Date(), 'dd MMM yyyy')"
             ></Datepicker>
           </div>
         </div>
@@ -121,25 +121,19 @@ export default {
   },
   data: () => ({
     isUpdating: false,
-    sort: {
-      departureDate: false,
-      arrivalDate: false,
-      flightNumber: false,
-    },
     search: {
       arrivalStation: {
-        placeName: '',
         countryName: '',
+        placeId: '',
+        placeName: '',
       },
       departureStation: {
-        placeName: '',
         countryName: '',
+        placeId: '',
+        placeName: '',
       },
-      departureDate: null,
-      returnDate: null,
-      desc: false,
-      flightNumber: null,
-      sortby: null,
+      departureDate: '',
+      returnDate: '',
     },
     disablePastDates: {
       to: new Date(Date.now() - 3600 * 1000 * 24),
@@ -186,8 +180,9 @@ export default {
     },
 
     onDepartureStationSelected(station) {
-      this.search.departureStation.placeName = station.PlaceName
       this.search.departureStation.countryName = station.CountryName
+      this.search.departureStation.placeId = station.PlaceId
+      this.search.departureStation.placeName = station.PlaceName
     },
 
     filterArrivalStations(val) {
@@ -219,8 +214,9 @@ export default {
     },
 
     onArrivalStationSelected(station) {
-      this.search.arrivalStation.placeName = station.PlaceName
       this.search.arrivalStation.countryName = station.CountryName
+      this.search.arrivalStation.placeId = station.PlaceId
+      this.search.arrivalStation.placeName = station.PlaceName
     },
 
     searchFlights() {
@@ -232,7 +228,14 @@ export default {
         return
       }
 
-      console.log('wee')
+      const payload = {
+        departureDate: this.$dateFns.format(
+          this.search.departureDate,
+          'yyyy-MM-dd'
+        ),
+      }
+
+      console.log(payload)
     },
   },
 }
