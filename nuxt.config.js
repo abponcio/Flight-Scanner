@@ -17,12 +17,12 @@ export default {
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
-  css: ['@/assets/scss/bootstrap.scss', '@/assets/scss/index.scss',],
+  css: ['@/assets/scss/bootstrap.scss', '@/assets/scss/index.scss'],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     { src: '~/plugins/axios.client.js', ssr: false },
-    { src: '~/plugins/vue.client.js', ssr: false }
+    { src: '~/plugins/vue.client.js', ssr: false },
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)

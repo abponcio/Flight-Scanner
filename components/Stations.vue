@@ -281,6 +281,7 @@ export default {
 .v-suggestions {
   position: relative;
 }
+
 .dropdown__wrapper {
   padding: 30px;
   background: $primary-white;
@@ -296,7 +297,7 @@ export default {
   &.arrow-up {
     top: calc(100% + 10px);
 
-    &:before {
+    &::before {
       content: '';
       width: 0;
       height: 0;
@@ -310,7 +311,7 @@ export default {
       border-bottom: 9px solid $primary-white;
     }
 
-    &:after {
+    &::after {
       content: '';
       width: 0;
       height: 0;
@@ -329,11 +330,13 @@ export default {
   max-height: 250px;
   overflow-y: auto;
 }
+
 .country__wrap-inner {
   -webkit-column-count: 1;
   -moz-column-count: 1;
   column-count: 1;
 }
+
 .country__wrap {
   display: inline-block;
   width: 100%;
