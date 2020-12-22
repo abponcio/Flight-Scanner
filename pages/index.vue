@@ -107,18 +107,18 @@ export default {
     }
   },
 
-  async asyncData({ $axios }) {
-    const getStations = await $axios.get(
-      `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
-      {
-        params: {
-          query: 'Philippines',
-        },
-      }
-    )
+  // async asyncData({ $axios }) {
+  //   const getStations = await $axios.get(
+  //     `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
+  //     {
+  //       params: {
+  //         query: 'Philippines',
+  //       },
+  //     }
+  //   )
 
-    return { stations: getStations.data.Places }
-  },
+  //   return { stations: getStations.data.Places }
+  // },
   data: () => ({
     isUpdating: false,
     search: {
@@ -154,7 +154,7 @@ export default {
     async filterDepartureStations(val) {
       // check for value
       if (!val.length) {
-        return this.stations
+        return []
       }
 
       const getStations = await this.$axios.get(
@@ -167,33 +167,6 @@ export default {
       )
 
       return getStations.data.Places
-
-      // console.log('weeeee')
-      // // get all stations
-      // const stations = JSON.parse(JSON.stringify(this.stations))
-
-      // // we will not include the station from selected arrival station
-      // stations.splice(
-      //   stations.findIndex(
-      //     (station) =>
-      //       station.PlaceName === this.search.arrivalStation.placeName
-      //   ),
-      //   1
-      // )
-
-      // // check for value
-      // if (!val.length) {
-      //   return this.stations
-      // }
-
-      // // lowercase
-      // val = val.toLowerCase()
-
-      // return stations.filter(
-      //   (station) =>
-      //     station.PlaceName.toLowerCase().includes(val) ||
-      //     station.CountryName.toLowerCase().includes(val)
-      // )
     },
 
     onDepartureStationSelected(station) {
@@ -202,32 +175,22 @@ export default {
       this.search.departureStation.placeName = station.PlaceName
     },
 
-    filterArrivalStations(val) {
-      // get all stations
-      const stations = JSON.parse(JSON.stringify(this.stations))
-
-      // we will not include the station from selected departure station
-      stations.splice(
-        stations.findIndex(
-          (station) =>
-            station.PlaceName === this.search.departureStation.placeName
-        ),
-        1
-      )
-
+    async filterArrivalStations(val) {
       // check for value
       if (!val.length) {
-        return stations
+        return []
       }
 
-      // lowercase
-      val = val.toLowerCase()
-
-      return stations.filter(
-        (station) =>
-          station.PlaceName.toLowerCase().includes(val) ||
-          station.CountryName.toLowerCase().includes(val)
+      const getStations = await this.$axios.get(
+        `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
+        {
+          params: {
+            query: val,
+          },
+        }
       )
+
+      return getStations.data.Places
     },
 
     onArrivalStationSelected(station) {

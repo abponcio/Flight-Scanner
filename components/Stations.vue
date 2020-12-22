@@ -13,12 +13,12 @@
       @focus="onFocus"
     />
     <div
-      v-show="showItems === true"
+      v-show="items.length && showItems === true"
       class="dropdown__wrapper dropdown--country arrow-up"
     >
       <div class="country__wrap-outer">
         <div class="country__wrap-inner">
-          <div v-show="items.length" class="country__wrap">
+          <div class="country__wrap">
             <ul>
               <li
                 v-for="(item, index) in items"
@@ -30,13 +30,6 @@
                 <span>{{ item.CountryName }}</span>
               </li>
             </ul>
-          </div>
-
-          <div
-            v-show="!items.length && showItems === true"
-            class="c-country__error"
-          >
-            No match found
           </div>
         </div>
       </div>
@@ -74,7 +67,7 @@ export default {
 
   data() {
     const defaultOptions = {
-      debounce: 0,
+      debounce: 300,
       placeholder: '',
       inputClass: 'input',
     }
