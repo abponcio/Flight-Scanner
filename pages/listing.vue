@@ -232,6 +232,8 @@ export default {
   }
 
   .flight-list {
+    margin-bottom: 50px;
+
     .flight-heading {
       display: flex;
       padding: 12px;
