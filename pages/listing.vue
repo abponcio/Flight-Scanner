@@ -27,7 +27,7 @@
             :key="quoteIndex"
             class="flight-box"
           >
-            <input type="radio" :value="quoteIndex" :name="quoteIndex" />
+            <input type="radio" :value="quoteIndex" name="flights" />
             <div class="flight-table">
               <div class="outbound">
                 <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
