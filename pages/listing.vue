@@ -123,6 +123,30 @@ export default {
   },
 
   async asyncData({ $axios, query, $dateFns }) {
+    /**
+     * This code is supposed to loop the current date till the departure date
+     *
+     *
+     */
+    // const departureFlights = []
+
+    // const loop = new Date(Date.now() - 3600 * 1000 * 24)
+    // while (loop <= new Date(query.departureDate)) {
+    //   const newDate = loop.setDate(loop.getDate() + 1)
+
+    //   console.log()
+
+    //   const getDepartureFlights = await $axios.get(
+    //     `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${
+    //       query.arrivalId
+    //     }/${$dateFns.format(newDate, 'yyyy-MM-dd')}`
+    //   )
+
+    //   departureFlights.push(getDepartureFlights.data)
+    // }
+
+    // console.log(departureFlights)
+
     const returnDate = query.returnDate || ''
     const getFlights = await $axios.get(
       `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${query.arrivalId}/${query.departureDate}/${returnDate}`
@@ -234,6 +258,7 @@ export default {
 
   .flight-list {
     margin-bottom: 50px;
+
     .flight-heading {
       display: flex;
       padding: 12px;
