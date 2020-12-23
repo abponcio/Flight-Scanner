@@ -107,18 +107,19 @@ export default {
     }
   },
 
-  // async asyncData({ $axios }) {
-  //   const getStations = await $axios.get(
-  //     `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
-  //     {
-  //       params: {
-  //         query: 'Philippines',
-  //       },
-  //     }
-  //   )
+  async asyncData({ $axios }) {
+    const getStations = await $axios.get(
+      `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
+      {
+        params: {
+          query: 'Philippines',
+        },
+      }
+    )
 
-  //   return { stations: getStations.data.Places }
-  // },
+    return { stations: getStations.data.Places }
+  },
+
   data: () => ({
     isUpdating: false,
     search: {
@@ -154,7 +155,7 @@ export default {
     async filterDepartureStations(val) {
       // check for value
       if (!val.length) {
-        return []
+        return this.stations
       }
 
       const getStations = await this.$axios.get(
@@ -178,7 +179,7 @@ export default {
     async filterArrivalStations(val) {
       // check for value
       if (!val.length) {
-        return []
+        return this.stations
       }
 
       const getStations = await this.$axios.get(
@@ -209,13 +210,22 @@ export default {
       }
 
       const payload = {
+        departureId: this.search.departureStation.placeId,
+        arrivalId: this.search.arrivalStation.placeId,
         departureDate: this.$dateFns.format(
           this.search.departureDate,
           'yyyy-MM-dd'
         ),
       }
 
-      console.log(payload)
+      if (this.search.returnDate) {
+        payload.returnDate = this.$dateFns.format(
+          this.search.returnDate,
+          'yyyy-MM-dd'
+        )
+      }
+
+      this.$router.push({ path: 'listing', query: payload })
     },
   },
 }

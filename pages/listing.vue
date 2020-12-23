@@ -4,9 +4,11 @@
       <h2>Departure Flight</h2>
       <div class="routes-filter-sort">
         <div class="routes">
-          {{ departureFlights.Places[1].CityName }}
-          <img src="~/assets/images/plane.svg" alt="Plane" />
-          {{ departureFlights.Places[0].CityName }}
+          <template v-if="departureFlights.Places.length">
+            {{ departureFlights.Places[1].CityName }}
+            <img src="~/assets/images/plane.svg" alt="Plane" />
+            {{ departureFlights.Places[0].CityName }}
+          </template>
         </div>
         <div class="sort">
           <div>Sort by:</div>
@@ -26,30 +28,41 @@
           <div>Arrival</div>
           <div>Fare</div>
         </div>
-        <div
-          v-for="(quote, quoteIndex) in departureFlights.Quotes"
-          :key="quoteIndex"
-          class="flight-box"
-        >
-          <input type="radio" :value="quoteIndex" name="deparureFlight" />
-          <div class="flight-table">
-            <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
-            <div class="departure">
-              <div class="code">{{ departureFlights.Places[1].IataCode }}</div>
-              <div class="name">{{ departureFlights.Places[1].Name }}</div>
-            </div>
-            <div class="image">
-              <img src="~/assets/images/plane.svg" alt="Plane" />
-            </div>
-            <div class="arrival">
-              <div class="code">{{ departureFlights.Places[0].IataCode }}</div>
-              <div class="name">{{ departureFlights.Places[0].Name }}</div>
-            </div>
-            <div class="fare">
-              {{ departureFlights.Currencies[0].Symbol }}{{ quote.MinPrice }}
+        <template v-if="departureFlights.Quotes.length">
+          <div
+            v-for="(quote, quoteIndex) in departureFlights.Quotes"
+            :key="quoteIndex"
+            class="flight-box"
+          >
+            <input type="radio" :value="quoteIndex" name="deparureFlight" />
+            <div class="flight-table">
+              <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
+              <div class="departure">
+                <div class="code">
+                  {{ departureFlights.Places[1].IataCode }}
+                </div>
+                <div class="name">{{ departureFlights.Places[1].Name }}</div>
+              </div>
+              <div class="image">
+                <img src="~/assets/images/plane.svg" alt="Plane" />
+                <div v-if="quote.Direct">Direct</div>
+                <div v-else>Connecting</div>
+              </div>
+              <div class="arrival">
+                <div class="code">
+                  {{ departureFlights.Places[0].IataCode }}
+                </div>
+                <div class="name">{{ departureFlights.Places[0].Name }}</div>
+              </div>
+              <div class="fare">
+                {{ departureFlights.Currencies[0].Symbol }}{{ quote.MinPrice }}
+              </div>
             </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <div class="no-flights">No Departure Flights Found</div>
+        </template>
       </div>
     </div>
 
@@ -107,26 +120,52 @@
 
 <script>
 export default {
-  async asyncData({ $axios }) {
+  validate({ query, redirect }) {
+    if (query.departureId && query.arrivalId && query.departureDate) {
+      return true
+    }
+
+    redirect('/')
+  },
+
+  async asyncData({ $axios, query }) {
+    const returnDate = query.returnDate || ''
     const getFlights = await $axios.get(
-      //   `/apiservices/browseroutes/v1.0/PH/USD/en-US/MNL-sky/JFK-sky/2020-12-25`
-      `/apiservices/browseroutes/v1.0/PH/USD/en-US/SFO-sky/ORD-sky/2020-12-25`
+      `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${query.arrivalId}/${query.departureDate}/${returnDate}`
     )
+
+    // https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsequotes/v1.0/PH/USD/en-US/SFO-sky/JFK-sky/2020-12-26/2020-12-29
 
     const data = getFlights.data
     const quotes = getFlights.data.Quotes
 
     for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
-      const outBoundLeg = quotes[quoteIndex].OutboundLeg.CarrierIds
+      // Outbound
+      const outboundCarrierIds = quotes[quoteIndex].OutboundLeg.CarrierIds
       for (
-        let outBoundLegIndex = 0;
-        outBoundLegIndex < outBoundLeg.length;
-        outBoundLegIndex++
+        let outboundCarrierIdsIndex = 0;
+        outboundCarrierIdsIndex < outboundCarrierIds.length;
+        outboundCarrierIdsIndex++
       ) {
-        const carrierId = outBoundLeg[outBoundLegIndex]
+        const outboundCarrierId = outboundCarrierIds[outboundCarrierIdsIndex]
         quotes[quoteIndex].OutboundLeg.Carrier = getFlights.data.Carriers.find(
-          (carrier) => carrier.CarrierId === carrierId
+          (carrier) => carrier.CarrierId === outboundCarrierId
         )
+      }
+
+      // Inbound
+      if (quotes[quoteIndex]?.InboundLeg?.CarrierIds) {
+        const inboundCarrierIds = quotes[quoteIndex].InboundLeg.CarrierIds
+        for (
+          let inboundCarrierIdsIndex = 0;
+          inboundCarrierIdsIndex < inboundCarrierIds.length;
+          inboundCarrierIdsIndex++
+        ) {
+          const inBoundCarrierId = inboundCarrierIds[inboundCarrierIdsIndex]
+          quotes[quoteIndex].InboundLeg.Carrier = getFlights.data.Carriers.find(
+            (carrier) => carrier.CarrierId === inBoundCarrierId
+          )
+        }
       }
     }
 
@@ -291,24 +330,37 @@ export default {
           }
 
           img {
-            width: 30px;
             position: relative;
+            width: 30px;
+          }
+
+          div {
+            color: $primary-green;
+            font-size: 10px;
+            margin-top: 5px;
           }
         }
 
         .departure,
         .arrival {
           .code {
+            font-family: $kautivaCyrillicBlackFont;
             font-size: 40px;
             line-height: 35px;
           }
 
           .name {
-            font-weight: 500;
             font-size: 12px;
+            font-weight: 500;
           }
         }
       }
+    }
+
+    .no-flights {
+      font-size: 20px;
+      margin-top: 15px;
+      text-align: center;
     }
   }
 }
