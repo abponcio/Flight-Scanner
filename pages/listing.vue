@@ -245,6 +245,7 @@ export default {
 
   h2 {
     font-family: $kautivaCyrillicBlackFont;
+    font-size: clamp(20px, 7vw, 32px);
   }
 
   .routes-filter-sort {
@@ -323,7 +324,6 @@ export default {
         padding: 30px 15px;
         position: relative;
         text-align: center;
-        text-transform: uppercase;
         width: 100%;
 
         &::before,
@@ -397,6 +397,7 @@ export default {
 
           .departureDate {
             color: $primary-black;
+            font-weight: 500;
             margin-top: 0;
           }
         }
@@ -427,5 +428,72 @@ export default {
 
 .flight-return {
   margin: 50px 0;
+}
+
+@media (max-width: 991.98px) {
+  .flight-table {
+    .image {
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .flight-departure,
+  .flight-return {
+    .routes-filter-sort {
+      display: block;
+
+      .routes {
+        font-size: clamp(15px, 4vw, 20px);
+      }
+
+      .sort {
+        margin-top: 10px;
+        width: 225px;
+
+        select {
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .flight-departure,
+  .flight-return {
+    .flight-list {
+      .flight-heading {
+        font-size: clamp(12px, 2vw, 15px);
+      }
+
+      .flight-box {
+        .flight-table {
+          padding: 30px 10px;
+          .departure,
+          .arrival {
+            .code {
+              font-size: clamp(25px, 8vw, 35px);
+            }
+          }
+
+          .image {
+            img {
+              width: 20px;
+            }
+          }
+
+          .airline,
+          .fare {
+            font-size: clamp(12px, 2vw, 15px);
+          }
+        }
+      }
+    }
+  }
 }
 </style>
