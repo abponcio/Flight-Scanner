@@ -27,7 +27,8 @@
             :key="quoteIndex"
             class="flight-box"
           >
-            <input type="radio" :value="quoteIndex" name="flights" />
+            <input type="radio" :value="quoteIndex" :name="quoteIndex" />
+            <div class="ribbon"><span>Lowest</span></div>
             <div class="flight-table">
               <div class="outbound">
                 <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
@@ -233,7 +234,6 @@ export default {
 
   .flight-list {
     margin-bottom: 50px;
-
     .flight-heading {
       display: flex;
       padding: 12px;
@@ -248,6 +248,54 @@ export default {
     .flight-box {
       margin-top: 15px;
       position: relative;
+
+      .ribbon {
+        height: 52px;
+        overflow: hidden;
+        position: absolute;
+        right: -6px;
+        top: -6px;
+        width: 72px;
+        z-index: 1;
+
+        &::before,
+        &::after {
+          border-right-color: transparent;
+          border-top-color: transparent;
+          border: 3px solid #aa1d11;
+          content: '';
+          display: block;
+          position: absolute;
+          z-index: -1;
+        }
+
+        &::before {
+          left: 20px;
+          top: 0;
+        }
+
+        &::after {
+          bottom: 0;
+          right: 0;
+        }
+
+        span {
+          background-color: $primary-red;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          color: #fff;
+          display: block;
+          font: 500 10px/1 -apple-system, BlinkMacSystemFont, 'Roboto',
+            'Helvetica Neue';
+          left: 3px;
+          padding: 5px 0;
+          position: absolute;
+          text-align: center;
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+          top: 10px;
+          transform: rotate(45deg);
+          width: 100px;
+        }
+      }
 
       input {
         cursor: pointer;
