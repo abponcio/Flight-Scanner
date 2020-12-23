@@ -4,10 +4,10 @@
       <h2>Departure Flight</h2>
       <div class="routes-filter-sort">
         <div class="routes">
-          <template v-if="departureFlights.Places.length">
-            {{ departureFlights.Places[1].CityName }}
+          <template v-if="flights.Quotes.length">
+            {{ flights.Quotes[0].OutboundLeg.Origin.CityName }}
             <img src="~/assets/images/plane.svg" alt="Plane" />
-            {{ departureFlights.Places[0].CityName }}
+            {{ flights.Quotes[0].OutboundLeg.Destination.CityName }}
           </template>
         </div>
         <div class="sort">
@@ -28,9 +28,9 @@
           <div>Arrival</div>
           <div>Fare</div>
         </div>
-        <template v-if="departureFlights.Quotes.length">
+        <template v-if="flights.Quotes.length">
           <div
-            v-for="(quote, quoteIndex) in departureFlights.Quotes"
+            v-for="(quote, quoteIndex) in flights.Quotes"
             :key="quoteIndex"
             class="flight-box"
           >
@@ -39,23 +39,33 @@
               <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
               <div class="departure">
                 <div class="code">
-                  {{ departureFlights.Places[1].IataCode }}
+                  {{ quote.OutboundLeg.Origin.IataCode }}
                 </div>
-                <div class="name">{{ departureFlights.Places[1].Name }}</div>
+                <div class="name">
+                  {{ quote.OutboundLeg.Origin.Name }}
+                </div>
               </div>
               <div class="image">
                 <img src="~/assets/images/plane.svg" alt="Plane" />
                 <div v-if="quote.Direct">Direct</div>
                 <div v-else>Connecting</div>
+                <div class="departureDate">
+                  {{
+                    $dateFns.format(
+                      quote.OutboundLeg.DepartureDate,
+                      'dd MMM yyyy'
+                    )
+                  }}
+                </div>
               </div>
               <div class="arrival">
                 <div class="code">
-                  {{ departureFlights.Places[0].IataCode }}
+                  {{ quote.OutboundLeg.Destination.IataCode }}
                 </div>
-                <div class="name">{{ departureFlights.Places[0].Name }}</div>
+                <div class="name">{{ quote.OutboundLeg.Destination.Name }}</div>
               </div>
               <div class="fare">
-                {{ departureFlights.Currencies[0].Symbol }}{{ quote.MinPrice }}
+                {{ flights.Currencies[0].Symbol }}{{ quote.MinPrice }}
               </div>
             </div>
           </div>
@@ -66,17 +76,25 @@
       </div>
     </div>
 
-    <div v-if="returnFlights" class="flight-return">
+    <div
+      v-if="flights.Quotes.length && flights.Quotes[0].InboundLeg"
+      class="flight-return"
+    >
       <h2>Return Flight</h2>
       <div class="routes-filter-sort">
-        <div class="routes">Cebu to Manila</div>
+        <div class="routes">
+          <template v-if="flights.Quotes.length">
+            {{ flights.Quotes[0].InboundLeg.Origin.CityName }}
+            <img src="~/assets/images/plane.svg" alt="Plane" />
+            {{ flights.Quotes[0].InboundLeg.Destination.CityName }}
+          </template>
+        </div>
         <div class="sort">
           <div>Sort by:</div>
           <select class="custom-select">
-            <option selected>Lowest to Highest Price</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            <option value="" selected>Price</option>
+            <option value="lowest">Lowest to Highest Price</option>
+            <option value="highest">Highest to Lowest</option>
           </select>
         </div>
       </div>
@@ -89,30 +107,49 @@
           <div>Arrival</div>
           <div>Fare</div>
         </div>
-        <div class="flight-box">
-          <input type="radio" value="1" name="radio3" />
-          <div class="flight-table">
-            <div class="airline">Airline</div>
-            <div class="departure">Departure</div>
-            <div class="image">
-              <img src="~/assets/images/plane.svg" alt="Plane" />
+        <template v-if="flights.Quotes[0].InboundLeg">
+          <div
+            v-for="(quote, quoteIndex) in flights.Quotes"
+            :key="quoteIndex"
+            class="flight-box"
+          >
+            <input type="radio" :value="quoteIndex" name="deparureFlight" />
+            <div class="flight-table">
+              <div class="airline">{{ quote.InboundLeg.Carrier.Name }}</div>
+              <div class="departure">
+                <div class="code">
+                  {{ quote.InboundLeg.Origin.IataCode }}
+                </div>
+                <div class="name">{{ quote.InboundLeg.Origin.Name }}</div>
+              </div>
+              <div class="image">
+                <img src="~/assets/images/plane.svg" alt="Plane" />
+                <div v-if="quote.Direct">Direct</div>
+                <div v-else>Connecting</div>
+                <div class="departureDate">
+                  {{
+                    $dateFns.format(
+                      quote.InboundLeg.DepartureDate,
+                      'dd MMM yyyy'
+                    )
+                  }}
+                </div>
+              </div>
+              <div class="arrival">
+                <div class="code">
+                  {{ quote.InboundLeg.Destination.IataCode }}
+                </div>
+                <div class="name">{{ quote.InboundLeg.Destination.Name }}</div>
+              </div>
+              <div class="fare">
+                {{ flights.Currencies[0].Symbol }}{{ quote.MinPrice }}
+              </div>
             </div>
-            <div class="arrival">Arrival</div>
-            <div class="fare">Fare</div>
           </div>
-        </div>
-        <div class="flight-box">
-          <input type="radio" value="2" name="radio3" />
-          <div class="flight-table">
-            <div class="airline">Airline</div>
-            <div class="departure">Departure</div>
-            <div class="image">
-              <img src="~/assets/images/plane.svg" alt="Plane" />
-            </div>
-            <div class="arrival">Arrival</div>
-            <div class="fare">Fare</div>
-          </div>
-        </div>
+        </template>
+        <template v-else>
+          <div class="no-flights">No Departure Flights Found</div>
+        </template>
       </div>
     </div>
   </section>
@@ -134,51 +171,70 @@ export default {
       `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${query.arrivalId}/${query.departureDate}/${returnDate}`
     )
 
-    // https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsequotes/v1.0/PH/USD/en-US/SFO-sky/JFK-sky/2020-12-26/2020-12-29
-
     const data = getFlights.data
-    const quotes = getFlights.data.Quotes
 
+    const quotes = getFlights.data.Quotes
     for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
-      // Outbound
+      // Outboud Carrier Ids
       const outboundCarrierIds = quotes[quoteIndex].OutboundLeg.CarrierIds
       for (
         let outboundCarrierIdsIndex = 0;
         outboundCarrierIdsIndex < outboundCarrierIds.length;
         outboundCarrierIdsIndex++
       ) {
+        // Carrier
         const outboundCarrierId = outboundCarrierIds[outboundCarrierIdsIndex]
         quotes[quoteIndex].OutboundLeg.Carrier = getFlights.data.Carriers.find(
           (carrier) => carrier.CarrierId === outboundCarrierId
         )
       }
 
-      // Inbound
-      if (quotes[quoteIndex]?.InboundLeg?.CarrierIds) {
+      // Outbound Origin
+      quotes[quoteIndex].OutboundLeg.Origin = getFlights.data.Places.find(
+        (places) => places.PlaceId === quotes[quoteIndex].OutboundLeg.OriginId
+      )
+
+      // Outbound Destination
+      quotes[quoteIndex].OutboundLeg.Destination = getFlights.data.Places.find(
+        (places) =>
+          places.PlaceId === quotes[quoteIndex].OutboundLeg.DestinationId
+      )
+
+      // Inbound Carrier Id
+      if (quotes[quoteIndex]?.InboundLeg) {
         const inboundCarrierIds = quotes[quoteIndex].InboundLeg.CarrierIds
         for (
           let inboundCarrierIdsIndex = 0;
           inboundCarrierIdsIndex < inboundCarrierIds.length;
           inboundCarrierIdsIndex++
         ) {
+          // Carrier
           const inBoundCarrierId = inboundCarrierIds[inboundCarrierIdsIndex]
           quotes[quoteIndex].InboundLeg.Carrier = getFlights.data.Carriers.find(
             (carrier) => carrier.CarrierId === inBoundCarrierId
           )
         }
+
+        // Inbound Origin
+        quotes[quoteIndex].InboundLeg.Origin = getFlights.data.Places.find(
+          (places) => places.PlaceId === quotes[quoteIndex].InboundLeg.OriginId
+        )
+
+        // Inbound Destination
+        quotes[quoteIndex].InboundLeg.Destination = getFlights.data.Places.find(
+          (places) =>
+            places.PlaceId === quotes[quoteIndex].InboundLeg.DestinationId
+        )
       }
     }
 
     data.Quotes = quotes
 
-    console.log(data)
-
-    return { departureFlights: data }
+    return { flights: data }
   },
 
   data: () => ({
-    departureFlights: null,
-    returnFlights: true,
+    flights: null,
   }),
 }
 </script>
@@ -275,7 +331,6 @@ export default {
           background: $primary-yellow;
           content: '';
           height: 20px;
-
           position: absolute;
           width: 15px;
         }
@@ -313,7 +368,7 @@ export default {
             content: '';
             position: absolute;
             left: -10%;
-            top: 12px;
+            top: 32px;
             width: 65px;
             border-top: 2px dashed $primary-grey;
             height: 1px;
@@ -323,7 +378,7 @@ export default {
             content: '';
             position: absolute;
             right: -15%;
-            top: 12px;
+            top: 32px;
             width: 75px;
             border-top: 2px dashed $primary-grey;
             height: 1px;
@@ -338,6 +393,11 @@ export default {
             color: $primary-green;
             font-size: 10px;
             margin-top: 5px;
+          }
+
+          .departureDate {
+            color: $primary-black;
+            margin-top: 0;
           }
         }
 
