@@ -5,8 +5,12 @@
         <div class="filter">Filters</div>
         <div class="sort">
           <div>Sort by:</div>
-          <select class="custom-select">
-            <option value="" selected>Price</option>
+          <select
+            v-model="sort.price"
+            class="custom-select"
+            @change="sortPrice()"
+          >
+            <option disabled value="">Price</option>
             <option value="lowest">Lowest to Highest Price</option>
             <option value="highest">Highest to Lowest</option>
           </select>
@@ -28,7 +32,9 @@
             class="flight-box"
           >
             <input type="radio" :value="flightIndex" name="flight" />
-            <div class="ribbon"><span>Lowest</span></div>
+            <div v-if="flight.lowestFare" class="ribbon">
+              <span>Lowest</span>
+            </div>
             <div class="flight-table">
               <div class="outbound">
                 <div class="airline">
@@ -233,7 +239,20 @@ export default {
 
   data: () => ({
     flights: [],
+    sort: {
+      price: '',
+    },
   }),
+
+  methods: {
+    sortPrice() {
+      if (this.sort.price === 'lowest') {
+        this.flights = this.flights.sort((a, b) => a.MinPrice - b.MinPrice)
+      } else {
+        this.flights = this.flights.sort((a, b) => b.MinPrice - a.MinPrice)
+      }
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
