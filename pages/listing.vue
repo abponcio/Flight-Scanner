@@ -19,9 +19,28 @@
         <div class="flight-heading box-container box-shadow">
           <div>Airline</div>
           <div>Departure</div>
-          <div>&nbsp;</div>
+          <div>
+            <div class="filter">
+              <div class="text">Date</div>
+              <div class="arrow">
+                <div class="arrow-up" @click.prevent="sortDate('asc')"></div>
+                <div class="arrow-down" @click.prevent="sortDate('desc')"></div>
+              </div>
+            </div>
+          </div>
           <div>Arrival</div>
-          <div>Fare</div>
+          <div>
+            <div class="filter">
+              <div class="text">Fare</div>
+              <div class="arrow">
+                <div class="arrow-up" @click.prevent="sortPrice('asc')"></div>
+                <div
+                  class="arrow-down"
+                  @click.prevent="sortPrice('desc')"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
         <template v-if="flights.length">
           <div
@@ -264,17 +283,24 @@ export default {
   }),
 
   methods: {
-    sortFlight() {
-      switch (this.sort) {
-        case 'lowest':
+    sortPrice(val) {
+      switch (val) {
+        case 'asc':
           this.flights = this.flights.sort((a, b) => a.MinPrice - b.MinPrice)
           break
 
-        case 'highest':
+        case 'desc':
           this.flights = this.flights.sort((a, b) => b.MinPrice - a.MinPrice)
           break
 
-        case 'nearest':
+        default:
+          break
+      }
+    },
+
+    sortDate(val) {
+      switch (val) {
+        case 'asc':
           this.flights = this.flights.sort(
             (a, b) =>
               new Date(a.OutboundLeg.DepartureDate) -
@@ -282,7 +308,7 @@ export default {
           )
           break
 
-        case 'farthest':
+        case 'desc':
           this.flights = this.flights.sort(
             (a, b) =>
               new Date(b.OutboundLeg.DepartureDate) -
@@ -341,10 +367,43 @@ export default {
       display: flex;
       padding: 12px;
 
-      div {
+      & > div {
         flex-basis: 100%;
         text-align: center;
         font-weight: 600;
+
+        .filter {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .text {
+            display: block;
+          }
+
+          .arrow {
+            display: block;
+            margin-left: 10px;
+            .arrow-up {
+              border-bottom: 5px solid $primary-black;
+              border-left: 5px solid transparent;
+              border-right: 5px solid transparent;
+              cursor: pointer;
+              height: 0;
+              margin-bottom: 4px;
+              width: 0;
+            }
+
+            .arrow-down {
+              border-left: 5px solid transparent;
+              border-right: 5px solid transparent;
+              border-top: 5px solid $primary-black;
+              cursor: pointer;
+              height: 0;
+              margin-top: 4px;
+              width: 0;
+            }
+          }
+        }
       }
     }
 
