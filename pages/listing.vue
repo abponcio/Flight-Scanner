@@ -29,7 +29,12 @@
             :key="flightIndex"
             class="flight-box"
           >
-            <input type="radio" name="flight" />
+            <input
+              v-model="flightSelected"
+              :value="flight.QuoteId"
+              type="radio"
+              name="flight"
+            />
             <div v-if="flight.lowestFare" class="ribbon">
               <span>Lowest</span>
             </div>
@@ -237,6 +242,7 @@ export default {
 
   data: () => ({
     flights: [],
+    flightSelected: '',
     sort: '',
   }),
 
