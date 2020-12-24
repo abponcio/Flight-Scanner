@@ -287,7 +287,7 @@ export default {
         position: absolute;
         right: -6px;
         top: -6px;
-        width: 72px;
+        width: 55px;
         z-index: 1;
 
         &::before,
@@ -302,7 +302,7 @@ export default {
         }
 
         &::before {
-          left: 20px;
+          left: 0;
           top: 0;
         }
 
@@ -314,18 +314,18 @@ export default {
         span {
           background-color: $primary-red;
           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          color: #fff;
+          color: $primary-white;
           display: block;
           font: 500 10px/1 -apple-system, BlinkMacSystemFont, 'Roboto',
             'Helvetica Neue';
-          left: 3px;
-          padding: 5px 0;
+          left: -4px;
+          padding: 5px 0 5px 3px;
           position: absolute;
           text-align: center;
           text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-          top: 10px;
-          transform: rotate(45deg);
-          width: 100px;
+          top: 9px;
+          transform: rotate(43deg);
+          width: 75px;
         }
       }
 
