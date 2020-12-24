@@ -21,84 +21,88 @@
           <div>Arrival</div>
           <div>Fare</div>
         </div>
-        <template v-if="flights.Quotes.length">
-          <div
-            v-for="(quote, quoteIndex) in flights.Quotes"
-            :key="quoteIndex"
-            class="flight-box"
-          >
-            <input type="radio" :value="quoteIndex" :name="quoteIndex" />
-            <div class="ribbon"><span>Lowest</span></div>
-            <div class="flight-table">
-              <div class="outbound">
-                <div class="airline">{{ quote.OutboundLeg.Carrier.Name }}</div>
-                <div class="departure">
-                  <div class="code">
-                    {{ quote.OutboundLeg.Origin.IataCode }}
+        <template v-if="flights.length">
+          <div v-for="(flight, flightIndex) in flights" :key="flightIndex">
+            <div
+              v-for="(quote, quoteIndex) in flight.Quotes"
+              :key="quoteIndex"
+              class="flight-box"
+            >
+              <input type="radio" :value="quoteIndex" :name="quoteIndex" />
+              <div class="ribbon"><span>Lowest</span></div>
+              <div class="flight-table">
+                <div class="outbound">
+                  <div class="airline">
+                    {{ quote.OutboundLeg.Carrier.Name }}
                   </div>
-                  <div class="name">
-                    {{ quote.OutboundLeg.Origin.Name }}
+                  <div class="departure">
+                    <div class="code">
+                      {{ quote.OutboundLeg.Origin.IataCode }}
+                    </div>
+                    <div class="name">
+                      {{ quote.OutboundLeg.Origin.Name }}
+                    </div>
+                  </div>
+                  <div class="image">
+                    <img src="~/assets/images/plane.svg" alt="Plane" />
+                    <div v-if="quote.Direct">Direct</div>
+                    <div v-else>Connecting</div>
+                    <div class="departureDate">
+                      {{
+                        $dateFns.format(
+                          quote.OutboundLeg.DepartureDate,
+                          'dd MMM yyyy'
+                        )
+                      }}
+                    </div>
+                  </div>
+                  <div class="arrival">
+                    <div class="code">
+                      {{ quote.OutboundLeg.Destination.IataCode }}
+                    </div>
+                    <div class="name">
+                      {{ quote.OutboundLeg.Destination.Name }}
+                    </div>
+                  </div>
+                  <div class="fare">
+                    {{ flight.Currencies[0].Symbol }}{{ quote.MinPrice }}
                   </div>
                 </div>
-                <div class="image">
-                  <img src="~/assets/images/plane.svg" alt="Plane" />
-                  <div v-if="quote.Direct">Direct</div>
-                  <div v-else>Connecting</div>
-                  <div class="departureDate">
-                    {{
-                      $dateFns.format(
-                        quote.OutboundLeg.DepartureDate,
-                        'dd MMM yyyy'
-                      )
-                    }}
-                  </div>
-                </div>
-                <div class="arrival">
-                  <div class="code">
-                    {{ quote.OutboundLeg.Destination.IataCode }}
-                  </div>
-                  <div class="name">
-                    {{ quote.OutboundLeg.Destination.Name }}
-                  </div>
-                </div>
-                <div class="fare">
-                  {{ flights.Currencies[0].Symbol }}{{ quote.MinPrice }}
-                </div>
-              </div>
 
-              <div v-if="quote.InboundLeg" class="inbound">
-                <div class="airline">{{ quote.InboundLeg.Carrier.Name }}</div>
-                <div class="departure">
-                  <div class="code">
-                    {{ quote.InboundLeg.Origin.IataCode }}
+                <div v-if="quote.InboundLeg" class="inbound">
+                  <div class="airline">{{ quote.InboundLeg.Carrier.Name }}</div>
+                  <div class="departure">
+                    <div class="code">
+                      {{ quote.InboundLeg.Origin.IataCode }}
+                    </div>
+                    <div class="name">
+                      {{ quote.InboundLeg.Origin.Name }}
+                    </div>
                   </div>
-                  <div class="name">
-                    {{ quote.InboundLeg.Origin.Name }}
+                  <div class="image">
+                    <img src="~/assets/images/plane.svg" alt="Plane" />
+                    <div v-if="quote.Direct">Direct</div>
+                    <div v-else>Connecting</div>
+                    <div class="departureDate">
+                      {{
+                        $dateFns.format(
+                          quote.InboundLeg.DepartureDate,
+                          'dd MMM yyyy'
+                        )
+                      }}
+                    </div>
                   </div>
-                </div>
-                <div class="image">
-                  <img src="~/assets/images/plane.svg" alt="Plane" />
-                  <div v-if="quote.Direct">Direct</div>
-                  <div v-else>Connecting</div>
-                  <div class="departureDate">
-                    {{
-                      $dateFns.format(
-                        quote.InboundLeg.DepartureDate,
-                        'dd MMM yyyy'
-                      )
-                    }}
+                  <div class="arrival">
+                    <div class="code">
+                      {{ quote.InboundLeg.Destination.IataCode }}
+                    </div>
+                    <div class="name">
+                      {{ quote.InboundLeg.Destination.Name }}
+                    </div>
                   </div>
-                </div>
-                <div class="arrival">
-                  <div class="code">
-                    {{ quote.InboundLeg.Destination.IataCode }}
+                  <div class="fare">
+                    {{ flight.Currencies[0].Symbol }}{{ quote.MinPrice }}
                   </div>
-                  <div class="name">
-                    {{ quote.InboundLeg.Destination.Name }}
-                  </div>
-                </div>
-                <div class="fare">
-                  {{ flights.Currencies[0].Symbol }}{{ quote.MinPrice }}
                 </div>
               </div>
             </div>
@@ -123,99 +127,102 @@ export default {
   },
 
   async asyncData({ $axios, query, $dateFns }) {
-    /**
-     * This code is supposed to loop the current date till the departure date
-     *
-     *
-     */
-    // const departureFlights = []
+    const flightRanges = []
 
-    // const loop = new Date(Date.now() - 3600 * 1000 * 24)
-    // while (loop <= new Date(query.departureDate)) {
-    //   const newDate = loop.setDate(loop.getDate() + 1)
+    // Loop the date from today to departure date
+    const loopDate = new Date(Date.now() - 3600 * 1000 * 24)
+    while (loopDate <= new Date(query.departureDate)) {
+      const newDate = loopDate.setDate(loopDate.getDate() + 1)
+      const returnDate = query.returnDate || ''
 
-    //   console.log()
-
-    //   const getDepartureFlights = await $axios.get(
-    //     `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${
-    //       query.arrivalId
-    //     }/${$dateFns.format(newDate, 'yyyy-MM-dd')}`
-    //   )
-
-    //   departureFlights.push(getDepartureFlights.data)
-    // }
-
-    // console.log(departureFlights)
-
-    const returnDate = query.returnDate || ''
-    const getFlights = await $axios.get(
-      `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${query.arrivalId}/${query.departureDate}/${returnDate}`
-    )
-
-    const data = getFlights.data
-
-    const quotes = getFlights.data.Quotes
-    for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
-      // Outboud Carrier Ids
-      const outboundCarrierIds = quotes[quoteIndex].OutboundLeg.CarrierIds
-      for (
-        let outboundCarrierIdsIndex = 0;
-        outboundCarrierIdsIndex < outboundCarrierIds.length;
-        outboundCarrierIdsIndex++
-      ) {
-        // Carrier
-        const outboundCarrierId = outboundCarrierIds[outboundCarrierIdsIndex]
-        quotes[quoteIndex].OutboundLeg.Carrier = getFlights.data.Carriers.find(
-          (carrier) => carrier.CarrierId === outboundCarrierId
-        )
-      }
-
-      // Outbound Origin
-      quotes[quoteIndex].OutboundLeg.Origin = getFlights.data.Places.find(
-        (places) => places.PlaceId === quotes[quoteIndex].OutboundLeg.OriginId
+      const getFlights = await $axios.get(
+        `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${
+          query.arrivalId
+        }/${$dateFns.format(newDate, 'yyyy-MM-dd')}/${returnDate}`
       )
 
-      // Outbound Destination
-      quotes[quoteIndex].OutboundLeg.Destination = getFlights.data.Places.find(
-        (places) =>
-          places.PlaceId === quotes[quoteIndex].OutboundLeg.DestinationId
-      )
+      flightRanges.push(getFlights.data)
+    }
 
-      // Inbound Carrier Id
-      if (quotes[quoteIndex]?.InboundLeg) {
-        const inboundCarrierIds = quotes[quoteIndex].InboundLeg.CarrierIds
-        for (
-          let inboundCarrierIdsIndex = 0;
-          inboundCarrierIdsIndex < inboundCarrierIds.length;
-          inboundCarrierIdsIndex++
-        ) {
-          // Carrier
-          const inBoundCarrierId = inboundCarrierIds[inboundCarrierIdsIndex]
-          quotes[quoteIndex].InboundLeg.Carrier = getFlights.data.Carriers.find(
-            (carrier) => carrier.CarrierId === inBoundCarrierId
-          )
-        }
-
-        // Inbound Origin
-        quotes[quoteIndex].InboundLeg.Origin = getFlights.data.Places.find(
-          (places) => places.PlaceId === quotes[quoteIndex].InboundLeg.OriginId
-        )
-
-        // Inbound Destination
-        quotes[quoteIndex].InboundLeg.Destination = getFlights.data.Places.find(
-          (places) =>
-            places.PlaceId === quotes[quoteIndex].InboundLeg.DestinationId
-        )
+    // check if we have flight data
+    if (!flightRanges.length) {
+      return {
+        flights: [],
       }
     }
 
-    data.Quotes = quotes
+    // Remove the empty quotes
+    const flights = flightRanges.filter((flights) => flights.Quotes.length)
 
-    return { flights: data }
+    // Parse the data from skyscanner API
+    for (let flightsIndex = 0; flightsIndex < flights.length; flightsIndex++) {
+      const carriers = flights[flightsIndex].Carriers
+      const places = flights[flightsIndex].Places
+      const quotes = flights[flightsIndex].Quotes
+
+      for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
+        // Outboud Carrier Ids
+        const outboundCarrierIds = quotes[quoteIndex].OutboundLeg.CarrierIds
+        for (
+          let outboundCarrierIdsIndex = 0;
+          outboundCarrierIdsIndex < outboundCarrierIds.length;
+          outboundCarrierIdsIndex++
+        ) {
+          // Carrier
+          const outboundCarrierId = outboundCarrierIds[outboundCarrierIdsIndex]
+          quotes[quoteIndex].OutboundLeg.Carrier = carriers.find(
+            (carrier) => carrier.CarrierId === outboundCarrierId
+          )
+        }
+
+        // Outbound Origin
+        quotes[quoteIndex].OutboundLeg.Origin = places.find(
+          (places) => places.PlaceId === quotes[quoteIndex].OutboundLeg.OriginId
+        )
+
+        // Outbound Destination
+        quotes[quoteIndex].OutboundLeg.Destination = places.find(
+          (places) =>
+            places.PlaceId === quotes[quoteIndex].OutboundLeg.DestinationId
+        )
+
+        // Inbound Carrier Id
+        if (quotes[quoteIndex]?.InboundLeg) {
+          const inboundCarrierIds = quotes[quoteIndex].InboundLeg.CarrierIds
+          for (
+            let inboundCarrierIdsIndex = 0;
+            inboundCarrierIdsIndex < inboundCarrierIds.length;
+            inboundCarrierIdsIndex++
+          ) {
+            // Carrier
+            const inBoundCarrierId = inboundCarrierIds[inboundCarrierIdsIndex]
+            quotes[quoteIndex].InboundLeg.Carrier = carriers.find(
+              (carrier) => carrier.CarrierId === inBoundCarrierId
+            )
+          }
+
+          // Inbound Origin
+          quotes[quoteIndex].InboundLeg.Origin = places.find(
+            (places) =>
+              places.PlaceId === quotes[quoteIndex].InboundLeg.OriginId
+          )
+
+          // Inbound Destination
+          quotes[quoteIndex].InboundLeg.Destination = places.find(
+            (places) =>
+              places.PlaceId === quotes[quoteIndex].InboundLeg.DestinationId
+          )
+        }
+      }
+
+      flights[flightsIndex].Quotes = quotes
+    }
+
+    return { flights }
   },
 
   data: () => ({
-    flights: null,
+    flights: [],
   }),
 }
 </script>
