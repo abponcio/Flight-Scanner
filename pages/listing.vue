@@ -5,14 +5,12 @@
         <div class="filter">Filters</div>
         <div class="sort">
           <div>Sort by:</div>
-          <select
-            v-model="sort.price"
-            class="custom-select"
-            @change="sortPrice()"
-          >
-            <option disabled value="">Price</option>
+          <select v-model="sort" class="custom-select" @change="sortFlight()">
+            <option disabled value="">Please Select</option>
             <option value="lowest">Lowest to Highest Price</option>
             <option value="highest">Highest to Lowest</option>
+            <option value="nearest">Nearest Date</option>
+            <option value="farthest">Farthest Date</option>
           </select>
         </div>
       </div>
@@ -31,7 +29,7 @@
             :key="flightIndex"
             class="flight-box"
           >
-            <input type="radio" :value="flightIndex" name="flight" />
+            <input type="radio" name="flight" />
             <div v-if="flight.lowestFare" class="ribbon">
               <span>Lowest</span>
             </div>
@@ -239,17 +237,38 @@ export default {
 
   data: () => ({
     flights: [],
-    sort: {
-      price: '',
-    },
+    sort: '',
   }),
 
   methods: {
-    sortPrice() {
-      if (this.sort.price === 'lowest') {
-        this.flights = this.flights.sort((a, b) => a.MinPrice - b.MinPrice)
-      } else {
-        this.flights = this.flights.sort((a, b) => b.MinPrice - a.MinPrice)
+    sortFlight() {
+      switch (this.sort) {
+        case 'lowest':
+          this.flights = this.flights.sort((a, b) => a.MinPrice - b.MinPrice)
+          break
+
+        case 'highest':
+          this.flights = this.flights.sort((a, b) => b.MinPrice - a.MinPrice)
+          break
+
+        case 'nearest':
+          this.flights = this.flights.sort(
+            (a, b) =>
+              new Date(a.OutboundLeg.DepartureDate) -
+              new Date(b.OutboundLeg.DepartureDate)
+          )
+          break
+
+        case 'farthest':
+          this.flights = this.flights.sort(
+            (a, b) =>
+              new Date(b.OutboundLeg.DepartureDate) -
+              new Date(a.OutboundLeg.DepartureDate)
+          )
+          break
+
+        default:
+          break
       }
     },
   },
