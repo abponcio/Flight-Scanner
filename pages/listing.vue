@@ -50,7 +50,7 @@
           >
             <input
               v-model="flightSelected"
-              :value="flight.QuoteId"
+              :value="flight.selectedFlag"
               type="radio"
               name="flight"
             />
@@ -269,6 +269,8 @@ export default {
       ) {
         flights[index].lowestFare = true
       }
+
+      flights[index].selectedFlag = index
 
       return flight
     })
