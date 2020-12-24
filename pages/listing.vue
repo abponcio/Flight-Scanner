@@ -65,7 +65,7 @@
                     </div>
                   </div>
                   <div class="fare">
-                    {{ flight.Currencies[0].Symbol }}{{ quote.MinPrice }}
+                    {{ quote.Currencies[0].Symbol }}{{ quote.MinPrice }}
                   </div>
                 </div>
 
@@ -101,7 +101,7 @@
                     </div>
                   </div>
                   <div class="fare">
-                    {{ flight.Currencies[0].Symbol }}{{ quote.MinPrice }}
+                    {{ quote.Currencies[0].Symbol }}{{ quote.MinPrice }}
                   </div>
                 </div>
               </div>
@@ -213,6 +213,9 @@ export default {
               places.PlaceId === quotes[quoteIndex].InboundLeg.DestinationId
           )
         }
+
+        // Currencies
+        quotes[quoteIndex].Currencies = flights[flightsIndex].Currencies
       }
 
       flights[flightsIndex].Quotes = quotes
