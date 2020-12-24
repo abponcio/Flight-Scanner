@@ -3,15 +3,34 @@
     <div class="flight">
       <div class="filter-sort">
         <div class="filter">Filters</div>
-        <div class="sort">
-          <div>Sort by:</div>
-          <select v-model="sort" class="custom-select" @change="sortFlight()">
-            <option disabled value="">Please Select</option>
-            <option value="lowest">Lowest to Highest Price</option>
-            <option value="highest">Highest to Lowest</option>
-            <option value="nearest">Nearest Date</option>
-            <option value="farthest">Farthest Date</option>
-          </select>
+        <div class="filter-stops">
+          <div class="label">Stops:</div>
+          <div class="form-check form-check-inline">
+            <input
+              id="flightDirect"
+              v-model="flightStops"
+              class="form-check-input"
+              type="radio"
+              name="flightStops"
+              :value="true"
+              @change="filterStops()"
+            />
+            <label class="form-check-label" for="flightDirect">Direct</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              id="flightConnecting"
+              v-model="flightStops"
+              class="form-check-input"
+              type="radio"
+              name="flightStops"
+              :value="false"
+              @change="filterStops()"
+            />
+            <label class="form-check-label" for="flightConnecting"
+              >Connecting</label
+            >
+          </div>
         </div>
       </div>
 
@@ -275,12 +294,14 @@ export default {
       return flight
     })
 
-    return { flights }
+    return { flights, flightsCache: flights }
   },
 
   data: () => ({
     flights: [],
+    flightsCache: [],
     flightSelected: '',
+    flightStops: Boolean,
     sort: '',
   }),
 
@@ -322,6 +343,12 @@ export default {
           break
       }
     },
+
+    filterStops() {
+      this.flights = this.flightsCache.filter(
+        (flight) => flight.Direct === !!this.flightStops
+      )
+    },
   },
 }
 </script>
@@ -351,13 +378,11 @@ export default {
       }
     }
 
-    .sort {
-      align-items: center;
+    .filter-stops {
       display: flex;
-      justify-content: space-between;
 
-      div {
-        width: 75px;
+      .label {
+        width: 55px;
       }
     }
   }
