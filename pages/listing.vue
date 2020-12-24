@@ -233,9 +233,26 @@ export default {
         // Currencies
         quotes[quoteIndex].Currencies = flightsList[flightsListIndex].Currencies
 
+        // Add to flights
         flights.push(quotes[quoteIndex])
       }
     }
+
+    // Set the lowest fare
+    flights.map(function (flight, index) {
+      if (
+        flights[index].MinPrice ===
+        flights.reduce((accumulator, currentValue) =>
+          currentValue.MinPrice < accumulator.MinPrice
+            ? currentValue
+            : accumulator
+        ).MinPrice
+      ) {
+        flights[index].lowestFare = true
+      }
+
+      return flight
+    })
 
     return { flights }
   },
