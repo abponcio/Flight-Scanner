@@ -22,87 +22,85 @@
           <div>Fare</div>
         </div>
         <template v-if="flights.length">
-          <div v-for="(flight, flightIndex) in flights" :key="flightIndex">
-            <div
-              v-for="(quote, quoteIndex) in flight.Quotes"
-              :key="quoteIndex"
-              class="flight-box"
-            >
-              <input type="radio" :value="quoteIndex" :name="quoteIndex" />
-              <div class="ribbon"><span>Lowest</span></div>
-              <div class="flight-table">
-                <div class="outbound">
-                  <div class="airline">
-                    {{ quote.OutboundLeg.Carrier.Name }}
+          <div
+            v-for="(flight, flightIndex) in flights"
+            :key="flightIndex"
+            class="flight-box"
+          >
+            <input type="radio" :value="flightIndex" name="flight" />
+            <div class="ribbon"><span>Lowest</span></div>
+            <div class="flight-table">
+              <div class="outbound">
+                <div class="airline">
+                  {{ flight.OutboundLeg.Carrier.Name }}
+                </div>
+                <div class="departure">
+                  <div class="code">
+                    {{ flight.OutboundLeg.Origin.IataCode }}
                   </div>
-                  <div class="departure">
-                    <div class="code">
-                      {{ quote.OutboundLeg.Origin.IataCode }}
-                    </div>
-                    <div class="name">
-                      {{ quote.OutboundLeg.Origin.Name }}
-                    </div>
-                  </div>
-                  <div class="image">
-                    <img src="~/assets/images/plane.svg" alt="Plane" />
-                    <div v-if="quote.Direct">Direct</div>
-                    <div v-else>Connecting</div>
-                    <div class="departureDate">
-                      {{
-                        $dateFns.format(
-                          quote.OutboundLeg.DepartureDate,
-                          'dd MMM yyyy'
-                        )
-                      }}
-                    </div>
-                  </div>
-                  <div class="arrival">
-                    <div class="code">
-                      {{ quote.OutboundLeg.Destination.IataCode }}
-                    </div>
-                    <div class="name">
-                      {{ quote.OutboundLeg.Destination.Name }}
-                    </div>
-                  </div>
-                  <div class="fare">
-                    {{ quote.Currencies[0].Symbol }}{{ quote.MinPrice }}
+                  <div class="name">
+                    {{ flight.OutboundLeg.Origin.Name }}
                   </div>
                 </div>
+                <div class="image">
+                  <img src="~/assets/images/plane.svg" alt="Plane" />
+                  <div v-if="flight.Direct">Direct</div>
+                  <div v-else>Connecting</div>
+                  <div class="departureDate">
+                    {{
+                      $dateFns.format(
+                        flight.OutboundLeg.DepartureDate,
+                        'dd MMM yyyy'
+                      )
+                    }}
+                  </div>
+                </div>
+                <div class="arrival">
+                  <div class="code">
+                    {{ flight.OutboundLeg.Destination.IataCode }}
+                  </div>
+                  <div class="name">
+                    {{ flight.OutboundLeg.Destination.Name }}
+                  </div>
+                </div>
+                <div class="fare">
+                  {{ flight.Currencies[0].Symbol }}{{ flight.MinPrice }}
+                </div>
+              </div>
 
-                <div v-if="quote.InboundLeg" class="inbound">
-                  <div class="airline">{{ quote.InboundLeg.Carrier.Name }}</div>
-                  <div class="departure">
-                    <div class="code">
-                      {{ quote.InboundLeg.Origin.IataCode }}
-                    </div>
-                    <div class="name">
-                      {{ quote.InboundLeg.Origin.Name }}
-                    </div>
+              <div v-if="flight.InboundLeg" class="inbound">
+                <div class="airline">{{ flight.InboundLeg.Carrier.Name }}</div>
+                <div class="departure">
+                  <div class="code">
+                    {{ flight.InboundLeg.Origin.IataCode }}
                   </div>
-                  <div class="image">
-                    <img src="~/assets/images/plane.svg" alt="Plane" />
-                    <div v-if="quote.Direct">Direct</div>
-                    <div v-else>Connecting</div>
-                    <div class="departureDate">
-                      {{
-                        $dateFns.format(
-                          quote.InboundLeg.DepartureDate,
-                          'dd MMM yyyy'
-                        )
-                      }}
-                    </div>
+                  <div class="name">
+                    {{ flight.InboundLeg.Origin.Name }}
                   </div>
-                  <div class="arrival">
-                    <div class="code">
-                      {{ quote.InboundLeg.Destination.IataCode }}
-                    </div>
-                    <div class="name">
-                      {{ quote.InboundLeg.Destination.Name }}
-                    </div>
+                </div>
+                <div class="image">
+                  <img src="~/assets/images/plane.svg" alt="Plane" />
+                  <div v-if="flight.Direct">Direct</div>
+                  <div v-else>Connecting</div>
+                  <div class="departureDate">
+                    {{
+                      $dateFns.format(
+                        flight.InboundLeg.DepartureDate,
+                        'dd MMM yyyy'
+                      )
+                    }}
                   </div>
-                  <div class="fare">
-                    {{ quote.Currencies[0].Symbol }}{{ quote.MinPrice }}
+                </div>
+                <div class="arrival">
+                  <div class="code">
+                    {{ flight.InboundLeg.Destination.IataCode }}
                   </div>
+                  <div class="name">
+                    {{ flight.InboundLeg.Destination.Name }}
+                  </div>
+                </div>
+                <div class="fare">
+                  {{ flight.Currencies[0].Symbol }}{{ flight.MinPrice }}
                 </div>
               </div>
             </div>
@@ -127,6 +125,7 @@ export default {
   },
 
   async asyncData({ $axios, query, $dateFns }) {
+    // Initialize flight ranges
     const flightRanges = []
 
     // Loop the date from today to departure date
@@ -135,6 +134,7 @@ export default {
       const newDate = loopDate.setDate(loopDate.getDate() + 1)
       const returnDate = query.returnDate || ''
 
+      // Get flights from api
       const getFlights = await $axios.get(
         `/apiservices/browseroutes/v1.0/PH/USD/en-US/${query.departureId}/${
           query.arrivalId
@@ -151,14 +151,21 @@ export default {
       }
     }
 
+    // Initialize flights
+    const flights = []
+
     // Remove the empty quotes
-    const flights = flightRanges.filter((flights) => flights.Quotes.length)
+    const flightsList = flightRanges.filter((flights) => flights.Quotes.length)
 
     // Parse the data from skyscanner API
-    for (let flightsIndex = 0; flightsIndex < flights.length; flightsIndex++) {
-      const carriers = flights[flightsIndex].Carriers
-      const places = flights[flightsIndex].Places
-      const quotes = flights[flightsIndex].Quotes
+    for (
+      let flightsListIndex = 0;
+      flightsListIndex < flightsList.length;
+      flightsListIndex++
+    ) {
+      const carriers = flightsList[flightsListIndex].Carriers
+      const places = flightsList[flightsListIndex].Places
+      const quotes = flightsList[flightsListIndex].Quotes
 
       for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
         // Outboud Carrier Ids
@@ -215,10 +222,10 @@ export default {
         }
 
         // Currencies
-        quotes[quoteIndex].Currencies = flights[flightsIndex].Currencies
-      }
+        quotes[quoteIndex].Currencies = flightsList[flightsListIndex].Currencies
 
-      flights[flightsIndex].Quotes = quotes
+        flights.push(quotes[quoteIndex])
+      }
     }
 
     return { flights }
