@@ -209,6 +209,8 @@ export default {
         return
       }
 
+      this.$nuxt.$loading.start()
+
       const payload = {
         departureId: this.search.departureStation.placeId,
         arrivalId: this.search.arrivalStation.placeId,

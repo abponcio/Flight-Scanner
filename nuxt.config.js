@@ -84,4 +84,7 @@ export default {
       },
     },
   },
+
+  // Loading  (https://nuxtjs.org/guides/features/loading)
+  loading: '~/components/LoadingBar.vue',
 }
