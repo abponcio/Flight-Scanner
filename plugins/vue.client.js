@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuelidate from 'vuelidate'
 import Datepicker from 'vuejs-datepicker'
 import VueToastr from 'vue-toastr'
+import VueRangeSlider from 'vue-range-component'
 
 /**
  * Validation Plugin
@@ -23,3 +24,9 @@ Vue.component('Datepicker', Datepicker)
 Vue.use(VueToastr, {
   defaultTimeout: 5000,
 })
+
+/**
+ * Vue Range Slider
+ * https://github.com/xwpongithub/vue-range-slider
+ */
+Vue.component('VueRangeSlider', VueRangeSlider)

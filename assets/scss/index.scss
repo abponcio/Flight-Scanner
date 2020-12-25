@@ -4,6 +4,7 @@
 @import 'fonts';
 @import 'buttons';
 @import 'forms';
+@import 'vue-range-component/dist/vue-range-slider.css';
 
 body {
   background-color: $primary-yellow;
@@ -66,4 +67,16 @@ body {
   border-radius: 7px;
   margin: 5px 0;
   padding: 30px 60px;
+}
+
+
+/* Range Slider
+------------------------------------------------------------------------------- */
+.vue-range-slider.slider-component .slider .slider-process {
+  background-color: $primary-black;
+}
+
+.vue-range-slider.slider-component .slider-tooltip-wrap .slider-tooltip {
+  border-color: $primary-black;
+  background-color: $primary-black;
 }

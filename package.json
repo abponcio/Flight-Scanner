@@ -21,6 +21,7 @@
     "core-js": "^3.6.5",
     "debounce": "^1.2.0",
     "nuxt": "^2.14.6",
+    "vue-range-component": "^1.0.3",
     "vue-toastr": "^2.1.2",
     "vuejs-datepicker": "^1.6.2",
     "vuelidate": "^0.7.4"

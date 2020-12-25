@@ -1,17 +1,28 @@
 <template>
   <section>
+    <h1><nuxt-link to="/"> Flight Scanner</nuxt-link></h1>
     <div class="flight">
-      <div class="filter-sort">
-        <div class="filter">Filters</div>
+      <div class="filter-range-sort">
+        <div class="filter-range">
+          <div class="range-label">Cost:</div>
+          <div class="fare-range">
+            <VueRangeSlider
+              ref="slider"
+              v-model="filterCost"
+              :min="flightCostMin"
+              :max="flightCostMax"
+              :step="1"
+            ></VueRangeSlider>
+          </div>
+        </div>
         <div class="filter-stops">
-          <div class="label">Stops:</div>
+          <div class="stops-label">Stops:</div>
           <div class="form-check form-check-inline">
             <input
               id="flightDirect"
               v-model="flightStops"
               class="form-check-input"
               type="radio"
-              name="flightStops"
               :value="true"
               @change="filterStops()"
             />
@@ -23,7 +34,6 @@
               v-model="flightStops"
               class="form-check-input"
               type="radio"
-              name="flightStops"
               :value="false"
               @change="filterStops()"
             />
@@ -162,6 +172,12 @@
 </template>
 
 <script>
+import {
+  parseFlights,
+  setLowestFare,
+  getMinMax,
+} from '@/utilities/helpers.utility'
+
 export default {
   validate({ query, redirect }) {
     if (query.departureId && query.arrivalId && query.departureDate) {
@@ -195,106 +211,21 @@ export default {
     if (!flightRanges.length) {
       return {
         flights: [],
+        flightsCache: [],
+        flightCostMin: 0,
+        flightCostMax: 0,
       }
     }
 
-    // Initialize flights
-    const flights = []
+    // Parse flights and set the lowest fare
+    const flights = setLowestFare(parseFlights(flightRanges))
 
-    // Remove the empty quotes
-    const flightsList = flightRanges.filter((flights) => flights.Quotes.length)
-
-    // Parse the data from skyscanner API
-    for (
-      let flightsListIndex = 0;
-      flightsListIndex < flightsList.length;
-      flightsListIndex++
-    ) {
-      const carriers = flightsList[flightsListIndex].Carriers
-      const places = flightsList[flightsListIndex].Places
-      const quotes = flightsList[flightsListIndex].Quotes
-
-      for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
-        // Outboud Carrier Ids
-        const outboundCarrierIds = quotes[quoteIndex].OutboundLeg.CarrierIds
-        for (
-          let outboundCarrierIdsIndex = 0;
-          outboundCarrierIdsIndex < outboundCarrierIds.length;
-          outboundCarrierIdsIndex++
-        ) {
-          // Carrier
-          const outboundCarrierId = outboundCarrierIds[outboundCarrierIdsIndex]
-          quotes[quoteIndex].OutboundLeg.Carrier = carriers.find(
-            (carrier) => carrier.CarrierId === outboundCarrierId
-          )
-        }
-
-        // Outbound Origin
-        quotes[quoteIndex].OutboundLeg.Origin = places.find(
-          (places) => places.PlaceId === quotes[quoteIndex].OutboundLeg.OriginId
-        )
-
-        // Outbound Destination
-        quotes[quoteIndex].OutboundLeg.Destination = places.find(
-          (places) =>
-            places.PlaceId === quotes[quoteIndex].OutboundLeg.DestinationId
-        )
-
-        // Inbound Carrier Id
-        if (quotes[quoteIndex]?.InboundLeg) {
-          const inboundCarrierIds = quotes[quoteIndex].InboundLeg.CarrierIds
-          for (
-            let inboundCarrierIdsIndex = 0;
-            inboundCarrierIdsIndex < inboundCarrierIds.length;
-            inboundCarrierIdsIndex++
-          ) {
-            // Carrier
-            const inBoundCarrierId = inboundCarrierIds[inboundCarrierIdsIndex]
-            quotes[quoteIndex].InboundLeg.Carrier = carriers.find(
-              (carrier) => carrier.CarrierId === inBoundCarrierId
-            )
-          }
-
-          // Inbound Origin
-          quotes[quoteIndex].InboundLeg.Origin = places.find(
-            (places) =>
-              places.PlaceId === quotes[quoteIndex].InboundLeg.OriginId
-          )
-
-          // Inbound Destination
-          quotes[quoteIndex].InboundLeg.Destination = places.find(
-            (places) =>
-              places.PlaceId === quotes[quoteIndex].InboundLeg.DestinationId
-          )
-        }
-
-        // Currencies
-        quotes[quoteIndex].Currencies = flightsList[flightsListIndex].Currencies
-
-        // Add to flights
-        flights.push(quotes[quoteIndex])
-      }
+    return {
+      flights,
+      flightsCache: flights,
+      flightCostMin: getMinMax(flights).min,
+      flightCostMax: getMinMax(flights).max,
     }
-
-    // Set the lowest fare
-    flights.map(function (flight, index) {
-      if (
-        flights[index].MinPrice ===
-        flights.reduce((accumulator, currentValue) =>
-          currentValue.MinPrice < accumulator.MinPrice
-            ? currentValue
-            : accumulator
-        ).MinPrice
-      ) {
-        flights[index].lowestFare = true
-      }
-
-      flights[index].selectedFlag = index
-
-      return flight
-    })
-
-    return { flights, flightsCache: flights }
   },
 
   data: () => ({
@@ -302,8 +233,20 @@ export default {
     flightsCache: [],
     flightSelected: '',
     flightStops: Boolean,
-    sort: '',
   }),
+
+  computed: {
+    filterCost: {
+      get() {
+        return this.flightCostMax
+      },
+      set(price) {
+        this.flights = this.flightsCache.filter(
+          (flight) => flight.MinPrice <= price
+        )
+      },
+    },
+  },
 
   methods: {
     sortPrice(val) {
@@ -353,6 +296,20 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+h1 {
+  font-family: $kautivaCyrillicBlackFont;
+  margin-top: 50px;
+  font-size: clamp(30px, 8vw, 40px);
+
+  a {
+    color: $primary-black;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
 .flight {
   margin-top: 50px;
 
@@ -361,28 +318,31 @@ export default {
     font-size: clamp(20px, 7vw, 32px);
   }
 
-  .filter-sort {
+  .filter-range-sort {
     align-items: center;
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
 
-    .filter {
-      font-size: 20px;
+    .filter-range {
+      display: flex;
       font-weight: 600;
 
-      img {
-        margin-left: 15px;
-        margin-right: 15px;
-        width: 25px;
+      .range-label {
+        margin-right: 10px;
+      }
+
+      .fare-range {
+        width: 200px;
       }
     }
 
     .filter-stops {
       display: flex;
 
-      .label {
-        width: 55px;
+      .stops-label {
+        font-weight: 600;
+        margin-right: 10px;
       }
     }
   }
@@ -403,6 +363,7 @@ export default {
           display: flex;
           justify-content: center;
           align-items: center;
+
           .text {
             display: block;
           }
@@ -410,6 +371,7 @@ export default {
           .arrow {
             display: block;
             margin-left: 10px;
+
             .arrow-up {
               border-bottom: 5px solid $primary-black;
               border-left: 5px solid transparent;
@@ -663,6 +625,15 @@ export default {
 
 @media (max-width: 575.98px) {
   .flight {
+    .filter-range-sort {
+      align-items: flex-start;
+      flex-direction: column;
+
+      .filter-range {
+        margin-bottom: 10px;
+      }
+    }
+
     .flight-list {
       .flight-heading {
         font-size: clamp(12px, 2vw, 15px);
