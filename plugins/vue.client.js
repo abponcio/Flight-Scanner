@@ -3,6 +3,7 @@ import Vuelidate from 'vuelidate'
 import Datepicker from 'vuejs-datepicker'
 import VueToastr from 'vue-toastr'
 import VueRangeSlider from 'vue-range-component'
+import Multiselect from 'vue-multiselect'
 
 /**
  * Validation Plugin
@@ -30,3 +31,9 @@ Vue.use(VueToastr, {
  * https://github.com/xwpongithub/vue-range-slider
  */
 Vue.component('VueRangeSlider', VueRangeSlider)
+
+/**
+ * Vue Multiselect
+ * https://vue-multiselect.js.org/
+ */
+Vue.component('multiselect', Multiselect)

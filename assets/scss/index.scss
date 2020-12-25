@@ -5,6 +5,7 @@
 @import 'buttons';
 @import 'forms';
 @import 'vue-range-component/dist/vue-range-slider.css';
+@import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 body {
   background-color: $primary-yellow;
@@ -79,4 +80,48 @@ body {
 .vue-range-slider.slider-component .slider-tooltip-wrap .slider-tooltip {
   border-color: $primary-black;
   background-color: $primary-black;
+}
+
+/* Multiselect
+------------------------------------------------------------------------------- */
+.multiselect__tags {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 12px 12px;
+  font-size: 16px;
+  line-height: 1.42857143;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow: 1px 2px 0 1px rgba(0, 0, 0, 0.1);
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+.multiselect__placeholder {
+  color: #000000b3;
+  margin: 0;
+  padding: 0;
+}
+
+.multiselect__option {
+  padding: 15px 12px;
+}
+
+.multiselect__element {
+  border-bottom: 1px solid $primary-black;
+}
+
+.multiselect__option--highlight {
+  background: $primary-yellow;
+  color: $primary-black;
+}
+
+.multiselect__content-wrapper {
+  border: 1px solid $primary-black;
+}
+
+.multiselect__option--selected.multiselect__option--highlight {
+  background: $primary-yellow;
+  color: $primary-black;
 }

@@ -164,7 +164,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="no-flights">No Flights Found</div>
+          <div class="no-flights">No flights found</div>
         </template>
       </div>
     </div>

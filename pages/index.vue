@@ -7,38 +7,59 @@
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Departing Station</label>
-            <Stations
-              v-model="search.departureStation.placeName"
-              :is-invalid="$v.search.departureStation.placeName.$error"
-              :disabled="isUpdating"
-              :options="{ placeholder: 'Select Your Origin' }"
-              :on-input-change="filterDepartureStations"
-              :on-item-selected="onDepartureStationSelected"
-            />
+            <multiselect
+              v-model="departureStation"
+              :clear-on-select="false"
+              :hide-selected="true"
+              :internal-search="false"
+              :loading="isLoadingDepature"
+              :options="stations"
+              :searchable="true"
+              :show-labels="false"
+              label="PlaceName"
+              open-direction="bottom"
+              placeholder="Select Your Destination"
+              track-by="PlaceId"
+              @search-change="selectDeparture"
+            >
+              <span slot="noResult">No Station found</span>
+              <span slot="noOptions">Please type to search</span>
+            </multiselect>
             <div
-              v-if="$v.search.departureStation.placeName.$error"
+              v-if="$v.departureStation.PlaceName.$error"
               class="text-danger text-left"
             >
-              <small v-if="!$v.search.departureStation.placeName.required"
+              <small v-if="!$v.departureStation.PlaceName.required"
                 >Departing Station is required</small
               >
             </div>
           </div>
           <div class="form-group col-md-6">
             <label>Arrival Station</label>
-            <Stations
-              v-model="search.arrivalStation.placeName"
-              :is-invalid="$v.search.arrivalStation.placeName.$error"
-              :disabled="isUpdating"
-              :options="{ placeholder: 'Select Your Destination' }"
-              :on-input-change="filterArrivalStations"
-              :on-item-selected="onArrivalStationSelected"
-            />
+            <multiselect
+              v-model="arrivalStation"
+              :clear-on-select="false"
+              :hide-selected="true"
+              :internal-search="false"
+              :loading="isLoadingArrival"
+              :options="stations"
+              :searchable="true"
+              :show-labels="false"
+              label="PlaceName"
+              open-direction="bottom"
+              placeholder="Select Your Destination"
+              track-by="PlaceId"
+              @search-change="selectArrival"
+            >
+              <span slot="noResult">No Station found</span>
+              <span slot="noOptions">Please type to search</span>
+            </multiselect>
+
             <div
-              v-if="$v.search.arrivalStation.placeName.$error"
+              v-if="$v.arrivalStation.PlaceName.$error"
               class="text-danger text-left"
             >
-              <small v-if="!$v.search.arrivalStation.placeName.required"
+              <small v-if="!$v.arrivalStation.PlaceName.required"
                 >Arrival Station is required</small
               >
             </div>
@@ -49,17 +70,14 @@
           <div class="form-group col-md-6">
             <label>Departure Date</label>
             <Datepicker
-              v-model="search.departureDate"
+              v-model="departureDate"
               :disabled-dates="disablePastDates"
               :input-class="dateValidate"
               format="dd MMM yyyy"
               :placeholder="$dateFns.format(new Date(), 'dd MMM yyyy')"
             ></Datepicker>
-            <div
-              v-if="$v.search.departureDate.$error"
-              class="text-danger text-left"
-            >
-              <small v-if="!$v.search.departureDate.required"
+            <div v-if="$v.departureDate.$error" class="text-danger text-left">
+              <small v-if="!$v.departureDate.required"
                 >Departure Date is required</small
               >
             </div>
@@ -67,7 +85,7 @@
           <div class="form-group col-md-6">
             <label>Return Date</label>
             <Datepicker
-              v-model="search.returnDate"
+              v-model="returnDate"
               :disabled-dates="disablePastDates"
               format="dd MMM yyyy"
               input-class="form-control"
@@ -86,24 +104,17 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators'
-import Stations from '~/components/Stations.vue'
 
 export default {
-  components: {
-    Stations,
-  },
-
   validations() {
     return {
-      search: {
-        departureStation: {
-          placeName: { required },
-        },
-        arrivalStation: {
-          placeName: { required },
-        },
-        departureDate: { required },
+      departureStation: {
+        PlaceName: { required },
       },
+      arrivalStation: {
+        PlaceName: { required },
+      },
+      departureDate: { required },
     }
   },
 
@@ -121,29 +132,22 @@ export default {
   },
 
   data: () => ({
-    isUpdating: false,
-    search: {
-      arrivalStation: {
-        countryName: '',
-        placeId: '',
-        placeName: '',
-      },
-      departureStation: {
-        countryName: '',
-        placeId: '',
-        placeName: '',
-      },
-      departureDate: '',
-      returnDate: '',
-    },
+    arrivalStation: [],
+    countPress: 1,
     disablePastDates: {
       to: new Date(Date.now() - 3600 * 1000 * 24),
     },
+    debounce: null,
+    departureDate: '',
+    departureStation: [],
+    isLoadingArrival: false,
+    isLoadingDepature: false,
+    returnDate: '',
   }),
 
   computed: {
     dateValidate() {
-      if (this.$v.search.departureDate.$error) {
+      if (this.$v.departureDate.$error) {
         return 'form-control is-invalid'
       }
 
@@ -152,53 +156,55 @@ export default {
   },
 
   methods: {
-    async filterDepartureStations(val) {
-      // check for value
-      if (!val.length) {
-        return this.stations
+    selectDeparture(val) {
+      if (!val || this.countPress < 2) {
+        this.countPress++
+        return []
       }
 
-      const getStations = await this.$axios.get(
-        `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
-        {
-          params: {
-            query: val,
-          },
-        }
-      )
+      this.isLoadingDeparture = true
 
-      return getStations.data.Places
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        this.$axios
+          .get(`/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`, {
+            params: {
+              query: val,
+            },
+          })
+          .then((response) => {
+            this.stations = response.data.Places
+            this.isLoadingDeparture = false
+            this.countPress = 1
+          })
+      }, 600)
     },
 
-    onDepartureStationSelected(station) {
-      this.search.departureStation.countryName = station.CountryName
-      this.search.departureStation.placeId = station.PlaceId
-      this.search.departureStation.placeName = station.PlaceName
-    },
-
-    async filterArrivalStations(val) {
-      // check for value
-      if (!val.length) {
-        return this.stations
+    selectArrival(val) {
+      if (!val || this.countPress < 2) {
+        this.countPress++
+        return []
       }
 
-      const getStations = await this.$axios.get(
-        `/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`,
-        {
-          params: {
-            query: val,
-          },
-        }
-      )
+      this.isLoadingArrival = true
 
-      return getStations.data.Places
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        this.$axios
+          .get(`/apiservices/autosuggest/v1.0/UK/GBP/en-GB/`, {
+            params: {
+              query: val,
+            },
+          })
+          .then((response) => {
+            this.stations = response.data.Places
+            this.isLoadingArrival = false
+            this.countPress = 1
+          })
+      }, 600)
     },
 
-    onArrivalStationSelected(station) {
-      this.search.arrivalStation.countryName = station.CountryName
-      this.search.arrivalStation.placeId = station.PlaceId
-      this.search.arrivalStation.placeName = station.PlaceName
-    },
+    fetchStations(val) {},
 
     searchFlights() {
       this.$v.$touch()
@@ -212,19 +218,13 @@ export default {
       this.$nuxt.$loading.start()
 
       const payload = {
-        departureId: this.search.departureStation.placeId,
-        arrivalId: this.search.arrivalStation.placeId,
-        departureDate: this.$dateFns.format(
-          this.search.departureDate,
-          'yyyy-MM-dd'
-        ),
+        departureId: this.departureStation.PlaceId,
+        arrivalId: this.arrivalStation.PlaceId,
+        departureDate: this.$dateFns.format(this.departureDate, 'yyyy-MM-dd'),
       }
 
-      if (this.search.returnDate) {
-        payload.returnDate = this.$dateFns.format(
-          this.search.returnDate,
-          'yyyy-MM-dd'
-        )
+      if (this.returnDate) {
+        payload.returnDate = this.$dateFns.format(this.returnDate, 'yyyy-MM-dd')
       }
 
       this.$router.push({ path: 'listing', query: payload })
