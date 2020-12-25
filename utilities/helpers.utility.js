@@ -99,6 +99,13 @@ export const setLowestFare = (flights) => {
 }
 
 export const getMinMax = (flights) => {
+  if (!flights.length) {
+    return {
+      min: 0,
+      max: 0,
+    }
+  }
+
   let min = flights[0].MinPrice
   let max = flights[0].MinPrice
 
