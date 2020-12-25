@@ -230,9 +230,10 @@ export default {
 
   data: () => ({
     flights: [],
-    flightsCache: [],
+    flightCost: '',
     flightSelected: '',
     flightStops: Boolean,
+    flightsCache: [],
   }),
 
   computed: {
@@ -241,9 +242,18 @@ export default {
         return this.flightCostMax
       },
       set(price) {
-        this.flights = this.flightsCache.filter(
-          (flight) => flight.MinPrice <= price
-        )
+        this.flightCost = price
+
+        if (typeof this.flightStops === 'boolean') {
+          this.flights = this.flightsCache.filter(
+            (flight) =>
+              flight.MinPrice <= price && flight.Direct === !!this.flightStops
+          )
+        } else {
+          this.flights = this.flightsCache.filter(
+            (flight) => flight.MinPrice <= price
+          )
+        }
       },
     },
   },
@@ -289,7 +299,9 @@ export default {
 
     filterStops() {
       this.flights = this.flightsCache.filter(
-        (flight) => flight.Direct === !!this.flightStops
+        (flight) =>
+          flight.Direct === !!this.flightStops &&
+          flight.MinPrice <= this.flightCost
       )
     },
   },
