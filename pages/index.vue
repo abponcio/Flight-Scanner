@@ -227,7 +227,7 @@ export default {
         payload.returnDate = this.$dateFns.format(this.returnDate, 'yyyy-MM-dd')
       }
 
-      this.$router.push({ path: 'listing', query: payload })
+      this.$router.push({ path: 'listing/', query: payload })
     },
   },
 }
